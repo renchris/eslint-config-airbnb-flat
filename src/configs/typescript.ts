@@ -55,4 +55,16 @@ export const typescriptRules: Linter.RulesRecord = {
   // Disallow redundant return await (type-aware)
   'no-return-await': 'off',
   '@typescript-eslint/return-await': ['error', 'in-try-catch'],
+
+  // Disallow unused variables (type-aware, Airbnb options)
+  'no-unused-vars': 'off',
+  '@typescript-eslint/no-unused-vars': ['error', { vars: 'all', args: 'after-used', ignoreRestSiblings: true }],
+
+  // Disallow unnecessary constructors (type-aware)
+  'no-useless-constructor': 'off',
+  '@typescript-eslint/no-useless-constructor': 'error',
+
+  // Disallow use of the Array constructor (type-aware)
+  'no-array-constructor': 'off',
+  '@typescript-eslint/no-array-constructor': 'error',
 }

@@ -32,7 +32,7 @@ export interface AirbnbOptions {
 
   /**
    * Enable React + JSX-a11y support.
-   * - `true`: Enable with defaults (18 rules: self-closing-comp, jsx-boolean-value, etc.)
+   * - `true`: Enable with defaults (26 rules: self-closing-comp, jsx-boolean-value, etc.)
    * - `false` or omitted: Disable
    * - `object`: Enable with custom overrides
    */

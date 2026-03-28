@@ -5,11 +5,11 @@ import { reactRules } from '../src/configs/react.js'
 import { typescriptRules } from '../src/configs/typescript.js'
 
 describe('rule parity with Airbnb', () => {
-  describe('base rules (97)', () => {
+  describe('base rules (101)', () => {
     const ruleNames = Object.keys(baseRules)
 
-    it('has exactly 97 base rules', () => {
-      expect(ruleNames).toHaveLength(97)
+    it('has exactly 101 base rules', () => {
+      expect(ruleNames).toHaveLength(101)
     })
 
     it('includes all Airbnb best-practices rules', () => {
@@ -145,8 +145,8 @@ describe('rule parity with Airbnb', () => {
   describe('react rules (26)', () => {
     const ruleNames = Object.keys(reactRules)
 
-    it('has exactly 26 react rules', () => {
-      expect(ruleNames).toHaveLength(26)
+    it('has exactly 27 react rules', () => {
+      expect(ruleNames).toHaveLength(27)
     })
 
     it('includes critical Airbnb React rules', () => {
@@ -182,8 +182,8 @@ describe('rule parity with Airbnb', () => {
   describe('typescript rules (9 pairs)', () => {
     const ruleNames = Object.keys(typescriptRules)
 
-    it('has exactly 18 entries (9 base-off + 9 TS-on)', () => {
-      expect(ruleNames).toHaveLength(18)
+    it('has exactly 24 entries (12 base-off + 12 TS-on)', () => {
+      expect(ruleNames).toHaveLength(24)
     })
 
     it('turns off base rules before enabling TS equivalents', () => {

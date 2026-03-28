@@ -17,10 +17,11 @@ export { baseRules, reactRules, typescriptRules }
  * Airbnb ESLint config for ESLint 9+ flat config.
  *
  * 1:1 rule parity with eslint-config-airbnb, audited against the Airbnb source.
- * 132 rules on top of recommended configs (97 base, 26 React, 9 TypeScript).
+ * 140 rules on top of recommended configs (101 base, 27 React, 12 TypeScript).
  *
- * With no options, produces a pure JavaScript config — typescript-eslint and its
- * parser are only loaded when `typescript: true` is passed.
+ * With no options, produces a pure JavaScript config — typescript-eslint configs
+ * and parser options are only included in the output when `typescript: true` is passed.
+ * Note: All plugin packages are bundled as dependencies and statically imported.
  *
  * @example
  * ```ts
@@ -133,7 +134,7 @@ export default function airbnb(
   }
 
   // -------------------------------------------------------------------------
-  // 5. Airbnb base rules (69 rules)
+  // 5. Airbnb base rules (101 rules)
   // -------------------------------------------------------------------------
   configs.push({
     name: 'airbnb-flat/base',
@@ -141,7 +142,7 @@ export default function airbnb(
   })
 
   // -------------------------------------------------------------------------
-  // 6. Airbnb React rules (18 rules, if enabled)
+  // 6. Airbnb React rules (27 rules, if enabled)
   // -------------------------------------------------------------------------
   if (react) {
     const reactOpts = typeof react === 'object' ? react : {} as ReactOptions

@@ -134,4 +134,32 @@ export const reactRules: Linter.RulesRecord = {
     assert: 'both',
     depth: 25,
   }],
+
+  // Airbnb enables this (jsx-a11y recommended has it 'off')
+  'jsx-a11y/control-has-associated-label': ['error', {
+    labelAttributes: ['label'],
+    controlComponents: [],
+    ignoreElements: [
+      'audio',
+      'canvas',
+      'embed',
+      'input',
+      'textarea',
+      'tr',
+      'video',
+    ],
+    ignoreRoles: [
+      'grid',
+      'listbox',
+      'menu',
+      'menubar',
+      'radiogroup',
+      'row',
+      'tablist',
+      'toolbar',
+      'tree',
+      'treegrid',
+    ],
+    depth: 5,
+  }],
 }

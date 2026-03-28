@@ -2,7 +2,7 @@ import type { Linter } from 'eslint'
 import confusingBrowserGlobals from 'confusing-browser-globals'
 
 /**
- * Airbnb base JavaScript rules — 97 rules from airbnb/javascript.
+ * Airbnb base JavaScript rules — 101 rules from airbnb/javascript.
  *
  * Sources: best-practices.js, errors.js, es6.js, variables.js, style.js
  * These are rules that Airbnb sets ON TOP of eslint:recommended.
@@ -250,8 +250,14 @@ export const baseRules: Linter.RulesRecord = {
   // Require all vars on top of their containing scope
   'vars-on-top': 'error',
 
+  // Require wrapping IIFE in parentheses
+  'wrap-iife': ['error', 'outside', { functionPrototypeMethods: false }],
+
   // Require or disallow Yoda conditions
   yoda: 'error',
+
+  // Disallow unnecessary constructors
+  'no-useless-constructor': 'error',
 
   // ==========================================================================
   // ES6 (es6.js)
@@ -340,6 +346,9 @@ export const baseRules: Linter.RulesRecord = {
   // Disallow use of undefined when initializing variables
   'no-undef-init': 'error',
 
+  // Disallow declaration of variables that are not used (Airbnb overrides eslint:recommended)
+  'no-unused-vars': ['error', { vars: 'all', args: 'after-used', ignoreRestSiblings: true }],
+
   // Disallow use of variables before they are defined
   'no-use-before-define': ['error', { functions: true, classes: true, variables: true }],
 
@@ -349,6 +358,9 @@ export const baseRules: Linter.RulesRecord = {
 
   // Require camel case names
   camelcase: ['error', { properties: 'never', ignoreDestructuring: false }],
+
+  // Disallow use of the Array constructor
+  'no-array-constructor': 'error',
 
   // Disallow use of bitwise operators
   'no-bitwise': 'error',

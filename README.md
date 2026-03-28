@@ -4,7 +4,7 @@ Airbnb's ESLint style guide for **ESLint 9+ flat config** with TypeScript and Re
 
 **1:1 rule parity** with `eslint-config-airbnb` -- 350 rules audited against the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript) source, 207 kept with exact option parity, 104 dropped with documented rationale.
 
-132 rules on top of recommended configs: 97 base JavaScript, 26 React + JSX-a11y, 9 TypeScript.
+140 rules on top of recommended configs: 101 base JavaScript, 27 React + JSX-a11y, 12 TypeScript.
 
 ## Why This Package?
 
@@ -125,7 +125,7 @@ export default defineConfig(...airbnb({ typescript: true, react: true }))
 ### Base (always enabled)
 
 - `eslint:recommended` (42 core rules)
-- **97 Airbnb rules**: best practices, ES6+, variables, style
+- **101 Airbnb rules**: best practices, ES6+, variables, style
 
 > Note: `typescript-eslint:recommended` and the TypeScript parser are only loaded when `typescript: true` is passed.
 
@@ -134,12 +134,12 @@ export default defineConfig(...airbnb({ typescript: true, react: true }))
 - `eslint-plugin-react` recommended + jsx-runtime
 - `eslint-plugin-react-hooks` (rules-of-hooks, exhaustive-deps)
 - `eslint-plugin-jsx-a11y` recommended
-- **26 Airbnb React rules**: self-closing-comp, jsx-boolean-value, no-array-index-key, jsx-props-no-spreading, etc.
+- **27 Airbnb React rules**: self-closing-comp, jsx-boolean-value, no-array-index-key, jsx-props-no-spreading, etc.
 
 ### TypeScript (opt-in: `typescript: true`)
 
-- **9 Airbnb TypeScript rule pairs**: turns off base rule, enables `@typescript-eslint` equivalent
-- naming-convention, dot-notation, no-shadow, no-use-before-define, no-loop-func, no-implied-eval, only-throw-error, no-unused-expressions, return-await
+- **12 Airbnb TypeScript rule pairs**: turns off base rule, enables `@typescript-eslint` equivalent
+- naming-convention, dot-notation, no-shadow, no-use-before-define, no-loop-func, no-implied-eval, only-throw-error, no-unused-expressions, return-await, no-unused-vars, no-useless-constructor, no-array-constructor
 
 ## Rule Audit
 
@@ -154,7 +154,7 @@ Every rule decision is documented in [`docs/rules.md`](./docs/rules.md) with:
 |----------|-------|--------|
 | Formatting / stylistic | ~60 | Handled by Prettier or `@stylistic/eslint-plugin` |
 | PropTypes | ~8 | TypeScript replaces runtime type checking |
-| Class components | ~6 | Modern React uses function components |
+| Class components | ~10 | Modern React uses function components |
 | `eslint-plugin-import` | ~25 | Plugin has chronic ESLint 9 issues; TypeScript handles imports |
 | TS-redundant | ~5 | Already enforced by `typescript-eslint:recommended` |
 
@@ -190,8 +190,8 @@ Every rule decision is documented in [`docs/rules.md`](./docs/rules.md) with:
 | Export | Description |
 |--------|-------------|
 | `default` | Factory function `airbnb(options, ...configs)` |
-| `baseRules` | Raw base rules object (97 rules) |
-| `reactRules` | Raw React rules object (26 rules) |
+| `baseRules` | Raw base rules object (101 rules) |
+| `reactRules` | Raw React rules object (27 rules) |
 | `ReactOptions` | TypeScript type for React options |
 | `TypeScriptOptions` | TypeScript type for TypeScript options |
 | `typescriptRules` | Raw TypeScript rules object (9 pairs) |
