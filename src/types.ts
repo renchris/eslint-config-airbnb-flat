@@ -21,6 +21,13 @@ export interface ReactOptions {
   overrides?: Linter.RulesRecord
 }
 
+export interface StylisticOptions {
+  /**
+   * Override specific stylistic rules.
+   */
+  overrides?: Linter.RulesRecord
+}
+
 export interface AirbnbOptions {
   /**
    * Enable TypeScript support.
@@ -37,6 +44,14 @@ export interface AirbnbOptions {
    * - `object`: Enable with custom overrides
    */
   react?: boolean | ReactOptions
+
+  /**
+   * Enable formatting/stylistic rules via @stylistic/eslint-plugin.
+   * - `true`: Enable with Airbnb defaults (~69 formatting rules)
+   * - `false` or omitted: Disable (formatting left to Prettier/Biome/etc.)
+   * - `object`: Enable with custom overrides
+   */
+  stylistic?: boolean | StylisticOptions
 
   /**
    * Override specific base rules.

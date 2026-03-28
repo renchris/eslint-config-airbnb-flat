@@ -4,14 +4,16 @@ import reactPlugin from 'eslint-plugin-react'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y'
 import globals from 'globals'
+import stylisticPlugin from '@stylistic/eslint-plugin'
 import type { Linter } from 'eslint'
-import type { AirbnbOptions, ReactOptions, TypeScriptOptions } from './types.js'
+import type { AirbnbOptions, ReactOptions, TypeScriptOptions, StylisticOptions } from './types.js'
 import { baseRules } from './configs/base.js'
 import { reactRules } from './configs/react.js'
 import { typescriptRules } from './configs/typescript.js'
+import { stylisticRules, stylisticJsxRules, stylisticTsRules } from './configs/stylistic.js'
 
-export type { AirbnbOptions, ReactOptions, TypeScriptOptions }
-export { baseRules, reactRules, typescriptRules }
+export type { AirbnbOptions, ReactOptions, TypeScriptOptions, StylisticOptions }
+export { baseRules, reactRules, typescriptRules, stylisticRules, stylisticJsxRules, stylisticTsRules }
 
 /**
  * Airbnb ESLint config for ESLint 9+ flat config.
@@ -46,6 +48,7 @@ export default function airbnb(
   const {
     typescript = false,
     react = false,
+    stylistic = false,
     overrides,
   } = options
 
@@ -168,6 +171,45 @@ export default function airbnb(
         ...tsOpts.overrides,
       },
     })
+  }
+
+  // -------------------------------------------------------------------------
+  // 7b. Stylistic formatting rules (if enabled)
+  // -------------------------------------------------------------------------
+  if (stylistic) {
+    const stylisticOpts = typeof stylistic === 'object' ? stylistic : {} as StylisticOptions
+
+    configs.push({
+      name: 'airbnb-flat/stylistic-plugin',
+      plugins: { '@stylistic': stylisticPlugin },
+    })
+
+    configs.push({
+      name: 'airbnb-flat/stylistic',
+      rules: { ...stylisticRules },
+    })
+
+    if (react) {
+      configs.push({
+        name: 'airbnb-flat/stylistic-jsx',
+        rules: { ...stylisticJsxRules },
+      })
+    }
+
+    if (typescript) {
+      configs.push({
+        name: 'airbnb-flat/stylistic-typescript',
+        files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+        rules: { ...stylisticTsRules },
+      })
+    }
+
+    if (stylisticOpts.overrides) {
+      configs.push({
+        name: 'airbnb-flat/stylistic-overrides',
+        rules: stylisticOpts.overrides,
+      })
+    }
   }
 
   // -------------------------------------------------------------------------

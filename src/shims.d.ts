@@ -21,3 +21,10 @@ declare module 'eslint-plugin-react-hooks' {
   const plugin: ESLint.Plugin
   export default plugin
 }
+
+declare module '@stylistic/eslint-plugin' {
+  import type { ESLint } from 'eslint'
+
+  const plugin: ESLint.Plugin
+  export default plugin
+}
