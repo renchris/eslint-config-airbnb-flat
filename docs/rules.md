@@ -12,7 +12,7 @@ No other Airbnb flat config alternative documents their decisions at this level.
 | Category | Count | Notes |
 |----------|-------|-------|
 | **Airbnb upstream rules audited** | ~350 | Across 6 source files + react + react-a11y + import + typescript |
-| **Shipped in this package** | 98 | 71 base + 18 React + 9 TypeScript pairs |
+| **Shipped in this package** | 140 | 101 base + 27 React + 12 TypeScript pairs |
 | **Inherited from recommended** | ~80 | eslint:recommended (42), tseslint:recommended (~25), react:recommended (~12) |
 | **Dropped** | ~170 | Formatting, PropTypes, class components, import plugin, redundant |
 
@@ -25,15 +25,28 @@ comes from layering:
 2. `typescript-eslint:recommended` (~25 rules) -- TS-specific safety
 3. `eslint-plugin-react:recommended` (~12 rules) -- React safety
 4. `eslint-plugin-jsx-a11y:recommended` (~30 rules) -- accessibility
-5. **`airbnb-flat/base`** (71 rules) -- Airbnb opinions beyond recommended
-6. **`airbnb-flat/react`** (18 rules) -- Airbnb React opinions beyond recommended
-7. **`airbnb-flat/typescript`** (9 rule pairs) -- type-aware replacements
+5. **`airbnb-flat/base`** (101 rules) -- Airbnb opinions beyond recommended
+6. **`airbnb-flat/react`** (27 rules) -- Airbnb React opinions beyond recommended
+7. **`airbnb-flat/typescript`** (12 rule pairs) -- type-aware replacements
 
 ---
 
-## Kept Rules -- Base (71 rules)
+## Kept Rules -- Base (101 rules)
 
-### Best Practices (39 rules)
+### Errors (4 rules)
+
+Source: `airbnb/javascript` > `packages/eslint-config-airbnb-base/rules/errors.js`
+
+These rules override `eslint:recommended` with stricter Airbnb options.
+
+| Rule | Severity | Options | Notes |
+|------|----------|---------|-------|
+| `no-console` | warn | -- | Warns on `console.log()`. Intentional logging should use a logger utility. |
+| `no-cond-assign` | error | `'always'` | eslint:recommended uses `'except-return'`. Airbnb is stricter: bans assignment in all conditionals. |
+| `getter-return` | error | `{ allowImplicit: true }` | eslint:recommended requires explicit return. Airbnb allows implicit return (bare `return`). |
+| `no-unsafe-optional-chaining` | error | `{ disallowArithmeticOperators: true }` | eslint:recommended has no options. Airbnb is stricter: bans `obj?.x + 1` (arithmetic on potentially undefined). |
+
+### Best Practices (57 rules)
 
 Source: `airbnb/javascript` > `packages/eslint-config-airbnb-base/rules/best-practices.js`
 
@@ -77,9 +90,27 @@ Source: `airbnb/javascript` > `packages/eslint-config-airbnb-base/rules/best-pra
 | `no-void` | error | -- | Bans `void` operator. |
 | `prefer-promise-reject-errors` | error | `{ allowEmptyReject: true }` | Reject with `Error` objects, not literals. Allows `reject()` with no argument. |
 | `radix` | error | -- | `parseInt()` must have radix argument: `parseInt(str, 10)`. |
+| `class-methods-use-this` | error | `{ exceptMethods: [] }` | Enforces that class methods use `this`. Methods that don't need `this` should be static or standalone functions. |
+| `default-param-last` | error | -- | Default parameters must be last. Prevents confusing `function(a = 1, b) {}`. |
+| `dot-notation` | error | `{ allowKeywords: true }` | Use `obj.prop` not `obj['prop']` when property is a valid identifier. |
+| `grouped-accessor-pairs` | error | -- | Getters and setters for the same property must be adjacent. |
+| `guard-for-in` | error | -- | `for...in` loops must filter with `hasOwnProperty` (prototype chain safety). Combined with `no-restricted-syntax` for defense-in-depth. |
+| `max-classes-per-file` | error | `1` | One class per file. Enforces single-responsibility at the file level. |
+| `no-empty-function` | error | `{ allow: ['arrowFunctions', 'functions', 'methods'] }` | Bans empty function bodies. Allows intentional empty arrows, functions, and methods (common in interfaces/defaults). |
+| `no-implied-eval` | error | -- | Bans `setTimeout('code')` and `setInterval('code')` (string arguments = implicit eval). |
+| `no-loop-func` | error | -- | Bans creating functions inside loops (closure over loop variable bugs). |
+| `no-new-func` | error | -- | Bans `new Function('a', 'return a')` (string-to-code like eval). |
+| `no-octal-escape` | error | -- | Bans octal escape sequences in strings (`'\251'`). Use Unicode escapes. |
+| `no-return-await` | error | -- | Bans `return await` (unnecessary microtask except in try/catch, where TS rule handles it). |
+| `no-throw-literal` | error | -- | Only `Error` objects (or subclasses) may be thrown. |
+| `no-unused-expressions` | error | `{ allowShortCircuit: false, allowTernary: false, allowTaggedTemplates: false }` | Bans expressions with no side effect. Strict: no `condition && action()` or ternary side effects. |
+| `no-useless-constructor` | error | -- | Bans constructors that only call `super()` with the same arguments. |
+| `prefer-regex-literals` | error | `{ disallowRedundantWrapping: true }` | Use `/regex/` not `new RegExp('regex')` when pattern is static. |
+| `vars-on-top` | error | -- | `var` declarations must be at the top of their scope (before `no-var` catches them). |
+| `wrap-iife` | error | `'outside', { functionPrototypeMethods: false }` | IIFEs must be wrapped in parentheses: `(function() {}())`. |
 | `yoda` | error | -- | Bans Yoda conditions: `if (color === 'red')` not `if ('red' === color)`. |
 
-### ES6 (14 rules)
+### ES6 (15 rules)
 
 Source: `airbnb/javascript` > `packages/eslint-config-airbnb-base/rules/es6.js`
 
@@ -99,17 +130,21 @@ Source: `airbnb/javascript` > `packages/eslint-config-airbnb-base/rules/es6.js`
 | `prefer-spread` | error | -- | Use `fn(...args)` not `fn.apply(null, args)`. |
 | `prefer-template` | error | -- | Use template literals for string concatenation. |
 | `symbol-description` | error | -- | `Symbol('description')` not `Symbol()`. |
+| `no-restricted-exports` | error | `{ restrictedNamedExports: ['default', 'then'] }` | Bans `export { x as default }` (use `export default`) and `export { x as then }` (breaks dynamic `import()`). |
 
-### Variables (2 rules)
+### Variables (5 rules)
 
 Source: `airbnb/javascript` > `packages/eslint-config-airbnb-base/rules/variables.js`
 
 | Rule | Severity | Options | Notes |
 |------|----------|---------|-------|
 | `no-label-var` | error | -- | Bans labels with same name as a variable (confusion hazard). |
+| `no-shadow` | error | -- | Bans variable declarations that shadow variables in outer scopes. Prevents confusion about which variable is referenced. |
 | `no-undef-init` | error | -- | Bans `let x = undefined` (redundant; `let x` is sufficient). |
+| `no-unused-vars` | error | `{ vars: 'all', args: 'after-used', ignoreRestSiblings: true }` | Airbnb overrides eslint:recommended: checks all vars, unused args only after the last used one, ignores rest siblings in destructuring. |
+| `no-use-before-define` | error | `{ functions: true, classes: true, variables: true }` | Bans use of variables, functions, and classes before they are defined. Strict: includes function declarations (no hoisting reliance). |
 
-### Style -- Non-Formatting (16 rules)
+### Style -- Non-Formatting (20 rules)
 
 Source: `airbnb/javascript` > `packages/eslint-config-airbnb-base/rules/style.js`
 
@@ -118,17 +153,21 @@ All pure formatting rules from style.js were dropped (see [Dropped -- Formatting
 
 | Rule | Severity | Options | Notes |
 |------|----------|---------|-------|
+| `camelcase` | error | `{ properties: 'never', ignoreDestructuring: false }` | Enforces camelCase naming. Does not enforce on object properties (API responses). Checks destructured names. |
+| `no-array-constructor` | error | -- | Bans `new Array(1, 2)` (confusing: `new Array(3)` creates sparse array). Use `[1, 2]`. |
 | `no-bitwise` | error | -- | Bans `&`, `|`, `^`, `~`, `<<`, `>>`, `>>>`. Usually a typo for `&&`/`||`. |
 | `no-continue` | error | -- | Bans `continue`. Airbnb prefers early returns and array methods. |
 | `no-lonely-if` | error | -- | `if` as sole statement in `else` should be `else if`. |
+| `no-mixed-operators` | error | See config | Bans ambiguous operator combinations (`%` with `+`, `&&` with `||`, etc.). Prevents precedence bugs. |
 | `no-multi-assign` | error | -- | Bans `a = b = c = 1`. Unclear which variables are being set. |
 | `no-nested-ternary` | error | -- | Bans `a ? b ? c : d : e`. Hard to read. |
 | `no-plusplus` | error | -- | Bans `++`/`--`. Use `+= 1`/`-= 1` (avoids semicolon insertion bugs). |
 | `no-restricted-syntax` | error | 4 selectors | Bans `for...in` (prototype chain), `for...of` (regenerator-runtime), labels, `with`. |
-| `no-underscore-dangle` | error | `{ allow: ['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'], enforceInMethodNames: true }` | Bans `_private` naming convention. Exception for Redux DevTools. |
+| `no-underscore-dangle` | error | `{ allow: [], enforceInMethodNames: true }` | Bans `_private` naming convention. Base config has no allow-list (React config overrides with Redux exception). |
 | `no-unneeded-ternary` | error | `{ defaultAssignment: false }` | Bans `x ? x : 'default'` and `x ? true : false`. |
 | `one-var` | error | `'never'` | One `const`/`let` per declaration. |
 | `operator-assignment` | error | `'always'` | Use `x += 1` not `x = x + 1`. |
+| `prefer-exponentiation-operator` | error | -- | Use `x ** 2` not `Math.pow(x, 2)`. Paired with `no-restricted-properties` ban on `Math.pow`. |
 | `prefer-object-spread` | error | -- | Use `{ ...obj }` not `Object.assign({}, obj)`. |
 | `spaced-comment` | error | See config | Require space after `//` and `/*`. Allows `/`, `!`, `=`, `::` markers. |
 | `new-cap` | error | `{ newIsCap: true, capIsNew: false }` | `new Foo()` not `new foo()`. Allows `Immutable.Map()` without `new`. |
@@ -137,7 +176,7 @@ All pure formatting rules from style.js were dropped (see [Dropped -- Formatting
 
 ---
 
-## Kept Rules -- React (18 rules)
+## Kept Rules -- React (27 rules)
 
 Source: `airbnb/javascript` > `packages/eslint-config-airbnb/rules/react.js` and `react-a11y.js`
 
@@ -145,7 +184,7 @@ These are rules Airbnb sets **on top of** `eslint-plugin-react:recommended` and
 `eslint-plugin-jsx-a11y:recommended`. Rules that are identical to the recommended
 configs are excluded (they're inherited automatically).
 
-### React Plugin Rules (17 rules)
+### React Plugin Rules (22 rules)
 
 | Rule | Severity | Options | Notes |
 |------|----------|---------|-------|
@@ -166,16 +205,30 @@ configs are excluded (they're inherited automatically).
 | `react/jsx-no-script-url` | error | `[{ name: 'Link', props: ['to'] }]` | Bans `javascript:` URLs in JSX, including React Router `Link` `to` prop. |
 | `react/void-dom-elements-no-children` | error | -- | Bans `<img>children</img>`, `<br>text</br>`, etc. |
 | `react/style-prop-object` | error | -- | `style` prop must be an object, not a string. |
+| `react/jsx-props-no-spreading` | error | `{ html: 'enforce', custom: 'enforce', explicitSpread: 'ignore' }` | Bans `<Comp {...props} />`. Explicit spread (`<Comp {...{ a, b }} />`) is allowed. |
+| `react/function-component-definition` | error | `{ namedComponents: ['function-declaration', 'function-expression'], unnamedComponents: 'function-expression' }` | Enforces consistent function component syntax. Named: function declaration or expression. Unnamed: expression only. |
+| `react/jsx-filename-extension` | error | `{ extensions: ['.jsx'] }` | Only `.jsx` files may contain JSX. TypeScript users override to `['.jsx', '.tsx']`. |
+| `react/jsx-no-bind` | error | `{ ignoreRefs: true, allowArrowFunctions: true, ignoreDOMComponents: true }` | Bans `.bind()` in JSX props (new function every render). Allows arrow functions and ref callbacks. |
+| `react/no-invalid-html-attribute` | error | -- | Catches invalid `rel`, `target`, etc. attribute values on HTML elements. |
 
-### JSX-a11y Override (1 rule)
+### Core ESLint Overrides for React (1 rule)
+
+| Rule | Severity | Options | Notes |
+|------|----------|---------|-------|
+| `no-underscore-dangle` | error | `{ allow: ['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'], enforceInMethodNames: true }` | React config overrides base: adds Redux DevTools to the allow-list. |
+
+### JSX-a11y Overrides (4 rules)
 
 | Rule | Severity | Options | Notes |
 |------|----------|---------|-------|
 | `jsx-a11y/no-autofocus` | error | `{ ignoreNonDOM: true }` | Airbnb override: allows `autoFocus` on custom components (e.g., modal focus traps), bans on native DOM elements. jsx-a11y:recommended does not set `ignoreNonDOM`. |
+| `jsx-a11y/anchor-is-valid` | error | `{ components: ['Link'], specialLink: ['to'], aspects: ['noHref', 'invalidHref', 'preferButton'] }` | Enforces valid anchor usage. Extends to React Router `Link` component and `to` prop. |
+| `jsx-a11y/label-has-associated-control` | error | `{ assert: 'both', depth: 25 }` | Labels must be associated with a form control via both `htmlFor` and nesting. Deep nesting traversal (25 levels). |
+| `jsx-a11y/control-has-associated-label` | error | See config | Form controls must have an accessible label. Airbnb enables this (jsx-a11y:recommended has it `off`). Ignores audio, canvas, embed, input, textarea, tr, video. |
 
 ---
 
-## Kept Rules -- TypeScript (9 rule pairs)
+## Kept Rules -- TypeScript (12 rule pairs)
 
 Source: `@kesills/eslint-config-airbnb-typescript` (maintained fork of `iamturns/eslint-config-airbnb-typescript`)
 
@@ -194,6 +247,9 @@ This prevents false positives from base rules that don't understand TypeScript s
 | `no-throw-literal` | `@typescript-eslint/only-throw-error` | error | -- | Type-aware: ensures only `Error` objects (or subclasses) are thrown. The TS rule is named `only-throw-error` (renamed from `no-throw-literal` in typescript-eslint v6). |
 | `no-unused-expressions` | `@typescript-eslint/no-unused-expressions` | error | `{ allowShortCircuit: false, allowTernary: false, allowTaggedTemplates: false }` | Type-aware: does not flag TypeScript-specific expressions like type assertions. Strict: no short-circuit or ternary side effects. |
 | `no-return-await` | `@typescript-eslint/return-await` | error | `'in-try-catch'` | Requires `return await` inside try/catch (needed for correct stack traces), forbids it elsewhere (unnecessary microtask). |
+| `no-unused-vars` | `@typescript-eslint/no-unused-vars` | error | `{ vars: 'all', args: 'after-used', ignoreRestSiblings: true }` | Type-aware: does not flag TypeScript type-only imports. Airbnb options preserved (check all vars, unused args after last used). |
+| `no-useless-constructor` | `@typescript-eslint/no-useless-constructor` | error | -- | Type-aware: understands TypeScript parameter properties (`constructor(private x: string) {}`). |
+| `no-array-constructor` | `@typescript-eslint/no-array-constructor` | error | -- | Type-aware: understands TypeScript generic array constructors (`new Array<string>()`). |
 
 ---
 
@@ -233,7 +289,6 @@ Dropped from `style.js`:
 | `new-parens` | error | Formatting (Prettier) |
 | `newline-per-chained-call` | error | Formatting (Prettier) |
 | `no-extra-parens` | error | Formatting (Prettier) |
-| `no-mixed-operators` | error | Formatting (Prettier) |
 | `no-mixed-spaces-and-tabs` | error | Formatting (Prettier), also in eslint:recommended |
 | `no-multi-spaces` | error | Formatting (Prettier) |
 | `no-multiple-empty-lines` | error | Formatting (Prettier) |
@@ -261,7 +316,6 @@ Dropped from `style.js`:
 | `template-curly-spacing` | error | Formatting (Prettier) |
 | `template-tag-spacing` | error | Formatting (Prettier) |
 | `unicode-bom` | error | Formatting (Prettier) |
-| `wrap-iife` | error | Formatting (Prettier) |
 | `wrap-regex` | error | Formatting (Prettier) |
 | `yield-star-spacing` | error | Formatting (Prettier) |
 
@@ -383,7 +437,6 @@ identical or stricter settings. Including them would be a no-op.
 | Rule | Why Dropped |
 |------|-------------|
 | `@typescript-eslint/no-explicit-any` | Already in tseslint:recommended (warn). |
-| `@typescript-eslint/no-unused-vars` | Already in tseslint:recommended (error). Consumers often customize. |
 | `@typescript-eslint/no-non-null-assertion` | Already in tseslint:recommended (warn). |
 | `@typescript-eslint/no-var-requires` | Already in tseslint:recommended (error). Deprecated in v8+. |
 | `@typescript-eslint/ban-ts-comment` | Already in tseslint:recommended (error with `allowWithDescription`). |
@@ -400,7 +453,6 @@ layers on top of). Duplicating them adds no value.
 | `no-extra-semi` | Identical to eslint:recommended (also formatting). |
 | `use-isnan` | Identical to eslint:recommended. |
 | `valid-typeof` | Identical to eslint:recommended. |
-| `no-cond-assign` | Identical to eslint:recommended. |
 | `no-constant-condition` | Identical to eslint:recommended. |
 | `no-dupe-args` | Identical to eslint:recommended. |
 | `no-dupe-keys` | Identical to eslint:recommended. |
@@ -419,7 +471,6 @@ layers on top of). Duplicating them adds no value.
 | `no-unsafe-finally` | Identical to eslint:recommended. |
 | `no-unsafe-negation` | Identical to eslint:recommended. |
 | `no-unused-labels` | Identical to eslint:recommended. |
-| `no-unused-vars` | Identical to eslint:recommended (overridden by tseslint:recommended in TS mode). |
 | `no-useless-catch` | Identical to eslint:recommended. |
 | `no-useless-escape` | Identical to eslint:recommended. |
 | `no-with` | Identical to eslint:recommended. |
@@ -452,23 +503,14 @@ in `react.ts` explicitly notes these exclusions.
 | `react/react-in-jsx-scope` | Identical to react:recommended (disabled in jsx-runtime). |
 | `react/require-render-return` | Identical to react:recommended. |
 
-### Miscellaneous Dropped Rules (~10 rules)
+### Miscellaneous Dropped Rules (~5 rules)
 
 | Rule | Original Source | Why Dropped |
 |------|----------------|-------------|
-| `no-restricted-exports` | es6.js | Airbnb-specific convention (`default` export restriction). Not universally useful. |
-| `class-methods-use-this` | best-practices.js | Class-specific. Function components don't have methods. |
-| `no-empty-function` | best-practices.js | TypeScript-eslint:recommended handles via `@typescript-eslint/no-empty-function`. |
-| `no-useless-constructor` | es6.js | TypeScript-eslint:recommended handles via `@typescript-eslint/no-useless-constructor`. |
 | `no-unused-private-class-members` | es6.js | Class-specific. TypeScript compiler catches unused members. |
 | `prefer-named-capture-group` | best-practices.js | Was `off` in Airbnb. ES2018 feature not universally adopted. |
 | `no-magic-numbers` | best-practices.js | Was `off` in Airbnb. Too noisy for most codebases. |
-| `max-classes-per-file` | best-practices.js | Class-specific. Function component files often co-locate helpers. |
-| `no-new-func` | best-practices.js | Subsumed by `no-eval` + `no-implied-eval` (type-aware TS version). |
-| `guard-for-in` | best-practices.js | `for...in` is already banned by `no-restricted-syntax`. |
 | `no-eq-null` | best-practices.js | Conflicts with `eqeqeq` `{ null: 'ignore' }` setting (Airbnb keeps it off). |
-| `react/jsx-props-no-spreading` | react.js | Was `error` in Airbnb. Highly controversial -- component libraries (Ark UI, Radix) rely on prop spreading. Left to consumers. |
-| `react/function-component-definition` | react.js | Was `error` in Airbnb (prefers `function` declarations). Arrow vs function is a team style choice. Left to consumers. |
 | `react/no-danger` | react.js | Kept as `warn` (see React table above). |
 
 ---
