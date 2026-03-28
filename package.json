@@ -9,6 +9,8 @@
     "type": "git",
     "url": "https://github.com/renchris/eslint-config-airbnb-flat.git"
   },
+  "homepage": "https://github.com/renchris/eslint-config-airbnb-flat#readme",
+  "bugs": "https://github.com/renchris/eslint-config-airbnb-flat/issues",
   "keywords": [
     "eslint",
     "eslintconfig",
@@ -19,6 +21,7 @@
     "react",
     "eslint9"
   ],
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -29,7 +32,9 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "engines": {
     "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
@@ -45,7 +50,7 @@
   },
   "dependencies": {
     "@eslint/js": "^9.0.0",
-    "@stylistic/eslint-plugin": "^4.0.0",
+    "confusing-browser-globals": "^1.0.11",
     "eslint-plugin-jsx-a11y": "^6.10.0",
     "eslint-plugin-react": "^7.37.0",
     "eslint-plugin-react-hooks": "^5.0.0",

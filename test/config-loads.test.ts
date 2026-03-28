@@ -84,4 +84,32 @@ describe('config loads', () => {
     const tsConfig = configs.find((c) => c.name === 'airbnb-flat/typescript')
     expect(tsConfig?.rules?.['@typescript-eslint/no-shadow']).toBe('warn')
   })
+
+  it('base-only config does NOT include typescript configs', () => {
+    const configs = airbnb()
+    const names = configs.map((c) => c.name).filter(Boolean) as string[]
+    const hasTs = names.some((n) => n.includes('typescript'))
+    expect(hasTs).toBe(false)
+  })
+
+  it('typescript-only config does NOT include react configs', () => {
+    const configs = airbnb({ typescript: true })
+    const names = configs.map((c) => c.name).filter(Boolean) as string[]
+    const hasReact = names.some((n) => n.includes('react') || n.includes('jsx-a11y'))
+    expect(hasReact).toBe(false)
+  })
+
+  it('typescript configs are scoped to TS files via files property', () => {
+    const configs = airbnb({ typescript: true })
+    const tsConfigs = configs.filter((c) =>
+      c.name === 'airbnb-flat/typescript' || c.name === 'airbnb-flat/typescript-parser',
+    )
+    expect(tsConfigs.length).toBeGreaterThanOrEqual(2)
+    for (const config of tsConfigs) {
+      expect(config.files, `${config.name} should have files property`).toBeDefined()
+      expect(config.files).toEqual(
+        expect.arrayContaining(['**/*.ts', '**/*.tsx']),
+      )
+    }
+  })
 })

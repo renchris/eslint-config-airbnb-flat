@@ -4,7 +4,7 @@ Airbnb's ESLint style guide for **ESLint 9+ flat config** with TypeScript and Re
 
 **1:1 rule parity** with `eslint-config-airbnb` -- 350 rules audited against the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript) source, 207 kept with exact option parity, 104 dropped with documented rationale.
 
-98 rules on top of recommended configs: 71 base JavaScript, 18 React + JSX-a11y, 9 TypeScript.
+132 rules on top of recommended configs: 97 base JavaScript, 26 React + JSX-a11y, 9 TypeScript.
 
 ## Why This Package?
 
@@ -88,20 +88,53 @@ export default airbnb({
 })
 ```
 
+### With Ignores
+
+```js
+import airbnb from 'eslint-config-airbnb-flat'
+
+export default airbnb(
+  { typescript: true, react: true },
+  { ignores: ['dist/', 'node_modules/', '.next/', '*.config.js'] },
+)
+```
+
+### With Next.js
+
+```js
+import airbnb from 'eslint-config-airbnb-flat'
+import nextPlugin from '@next/eslint-plugin-next'
+
+export default airbnb(
+  { typescript: true, react: true },
+  nextPlugin.flatConfig.recommended,
+)
+```
+
+### With ESLint 10 `defineConfig()`
+
+```js
+import { defineConfig } from 'eslint/config'
+import airbnb from 'eslint-config-airbnb-flat'
+
+export default defineConfig(...airbnb({ typescript: true, react: true }))
+```
+
 ## What's Included
 
 ### Base (always enabled)
 
 - `eslint:recommended` (42 core rules)
-- `typescript-eslint:recommended` (type-aware rules + parser)
-- **71 Airbnb rules**: best practices, ES6+, variables, style
+- **97 Airbnb rules**: best practices, ES6+, variables, style
+
+> Note: `typescript-eslint:recommended` and the TypeScript parser are only loaded when `typescript: true` is passed.
 
 ### React (opt-in: `react: true`)
 
 - `eslint-plugin-react` recommended + jsx-runtime
 - `eslint-plugin-react-hooks` (rules-of-hooks, exhaustive-deps)
 - `eslint-plugin-jsx-a11y` recommended
-- **18 Airbnb React rules**: self-closing-comp, jsx-boolean-value, no-array-index-key, etc.
+- **26 Airbnb React rules**: self-closing-comp, jsx-boolean-value, no-array-index-key, jsx-props-no-spreading, etc.
 
 ### TypeScript (opt-in: `typescript: true`)
 
@@ -157,8 +190,10 @@ Every rule decision is documented in [`docs/rules.md`](./docs/rules.md) with:
 | Export | Description |
 |--------|-------------|
 | `default` | Factory function `airbnb(options, ...configs)` |
-| `baseRules` | Raw base rules object (71 rules) |
-| `reactRules` | Raw React rules object (18 rules) |
+| `baseRules` | Raw base rules object (97 rules) |
+| `reactRules` | Raw React rules object (26 rules) |
+| `ReactOptions` | TypeScript type for React options |
+| `TypeScriptOptions` | TypeScript type for TypeScript options |
 | `typescriptRules` | Raw TypeScript rules object (9 pairs) |
 | `AirbnbOptions` | TypeScript type for options |
 

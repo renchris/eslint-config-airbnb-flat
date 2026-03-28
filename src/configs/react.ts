@@ -1,7 +1,7 @@
 import type { Linter } from 'eslint'
 
 /**
- * Airbnb React + JSX-a11y rules — 18 rules from airbnb/javascript.
+ * Airbnb React + JSX-a11y rules — 26 rules from airbnb/javascript.
  *
  * Sources: react.js, react-a11y.js
  * These are rules that Airbnb sets ON TOP of eslint-plugin-react recommended
@@ -71,10 +71,67 @@ export const reactRules: Linter.RulesRecord = {
   // Require style prop value be an object or var
   'react/style-prop-object': 'error',
 
+  // Disallow JSX props spreading
+  'react/jsx-props-no-spreading': ['error', {
+    html: 'enforce',
+    custom: 'enforce',
+    explicitSpread: 'ignore',
+    exceptions: [],
+  }],
+
+  // Enforce a specific function type for function components
+  'react/function-component-definition': ['error', {
+    namedComponents: ['function-declaration', 'function-expression'],
+    unnamedComponents: 'function-expression',
+  }],
+
+  // Only .jsx files may have JSX
+  'react/jsx-filename-extension': ['error', { extensions: ['.jsx'] }],
+
+  // Prevent usage of .bind() in JSX props
+  'react/jsx-no-bind': ['error', {
+    ignoreRefs: true,
+    allowArrowFunctions: true,
+    allowFunctions: false,
+    allowBind: false,
+    ignoreDOMComponents: true,
+  }],
+
+  // Prevent usage of invalid attributes
+  'react/no-invalid-html-attribute': 'error',
+
+  // ==========================================================================
+  // Core ESLint overrides for React (react.js)
+  // ==========================================================================
+
+  // Airbnb adds __REDUX_DEVTOOLS_EXTENSION_COMPOSE__ to the allow list in react config
+  'no-underscore-dangle': ['error', {
+    allow: ['__REDUX_DEVTOOLS_EXTENSION_COMPOSE__'],
+    allowAfterThis: false,
+    allowAfterSuper: false,
+    enforceInMethodNames: true,
+  }],
+
   // ==========================================================================
   // JSX-a11y overrides (react-a11y.js)
   // ==========================================================================
 
   // Airbnb sets ignoreNonDOM: true (jsx-a11y recommended does not)
   'jsx-a11y/no-autofocus': ['error', { ignoreNonDOM: true }],
+
+  // Airbnb adds Link component and 'to' specialLink
+  'jsx-a11y/anchor-is-valid': ['error', {
+    components: ['Link'],
+    specialLink: ['to'],
+    aspects: ['noHref', 'invalidHref', 'preferButton'],
+  }],
+
+  // Airbnb sets assert: 'both' and depth: 25
+  'jsx-a11y/label-has-associated-control': ['error', {
+    labelComponents: [],
+    labelAttributes: [],
+    controlComponents: [],
+    assert: 'both',
+    depth: 25,
+  }],
 }

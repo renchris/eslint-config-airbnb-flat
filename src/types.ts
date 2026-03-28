@@ -5,6 +5,13 @@ export interface TypeScriptOptions {
    * Override specific TypeScript rules.
    */
   overrides?: Linter.RulesRecord
+
+  /**
+   * Root directory for resolving tsconfig.json.
+   * Passed to typescript-eslint's `parserOptions.tsconfigRootDir`.
+   * @default process.cwd()
+   */
+  tsconfigRootDir?: string
 }
 
 export interface ReactOptions {

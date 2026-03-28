@@ -5,11 +5,11 @@ import { reactRules } from '../src/configs/react.js'
 import { typescriptRules } from '../src/configs/typescript.js'
 
 describe('rule parity with Airbnb', () => {
-  describe('base rules (69)', () => {
+  describe('base rules (97)', () => {
     const ruleNames = Object.keys(baseRules)
 
-    it('has exactly 71 base rules', () => {
-      expect(ruleNames).toHaveLength(71)
+    it('has exactly 97 base rules', () => {
+      expect(ruleNames).toHaveLength(97)
     })
 
     it('includes all Airbnb best-practices rules', () => {
@@ -94,13 +94,59 @@ describe('rule parity with Airbnb', () => {
       expect(selectors).toContain('LabeledStatement')
       expect(selectors).toContain('WithStatement')
     })
+
+    it('has all 10 no-restricted-properties entries', () => {
+      const rule = baseRules['no-restricted-properties'] as [string, ...Array<Record<string, unknown>>]
+      const entries = rule.slice(1)
+      expect(entries).toHaveLength(10)
+      const descriptions = entries.map((e) =>
+        [e.object, e.property].filter(Boolean).join('.'),
+      )
+      expect(descriptions).toContain('arguments.callee')
+      expect(descriptions).toContain('global.isFinite')
+      expect(descriptions).toContain('self.isFinite')
+      expect(descriptions).toContain('window.isFinite')
+      expect(descriptions).toContain('global.isNaN')
+      expect(descriptions).toContain('self.isNaN')
+      expect(descriptions).toContain('window.isNaN')
+      expect(descriptions).toContain('Math.pow')
+      // Property-only entries (no object specified)
+      const propertyOnly = entries.filter((e) => !e.object).map((e) => e.property)
+      expect(propertyOnly).toContain('__defineGetter__')
+      expect(propertyOnly).toContain('__defineSetter__')
+    })
+
+    it('has all 11 no-param-reassign ignorePropertyModificationsFor entries', () => {
+      const rule = baseRules['no-param-reassign'] as [string, Record<string, unknown>]
+      const allowList = rule[1].ignorePropertyModificationsFor as string[]
+      expect(allowList).toHaveLength(11)
+      const expected = [
+        'acc', 'accumulator', 'e', 'ctx', 'context',
+        'req', 'request', 'res', 'response', '$scope', 'staticContext',
+      ]
+      for (const name of expected) {
+        expect(allowList, `missing: ${name}`).toContain(name)
+      }
+    })
+
+    it('has correct max-len options (100 chars, tab width 2)', () => {
+      const rule = baseRules['max-len'] as [string, number, number, Record<string, unknown>]
+      expect(rule[0]).toBe('error')
+      expect(rule[1]).toBe(100)
+      expect(rule[2]).toBe(2)
+      expect(rule[3].ignoreUrls).toBe(true)
+      expect(rule[3].ignoreComments).toBe(false)
+      expect(rule[3].ignoreRegExpLiterals).toBe(true)
+      expect(rule[3].ignoreStrings).toBe(true)
+      expect(rule[3].ignoreTemplateLiterals).toBe(true)
+    })
   })
 
-  describe('react rules (18)', () => {
+  describe('react rules (26)', () => {
     const ruleNames = Object.keys(reactRules)
 
-    it('has exactly 18 react rules', () => {
-      expect(ruleNames).toHaveLength(18)
+    it('has exactly 26 react rules', () => {
+      expect(ruleNames).toHaveLength(26)
     })
 
     it('includes critical Airbnb React rules', () => {
@@ -166,6 +212,10 @@ describe('rule parity with Airbnb', () => {
       ) as Record<string, unknown> | undefined
       expect(variableRule?.format).toEqual(['camelCase', 'PascalCase', 'UPPER_CASE'])
     })
+
+    it('has @typescript-eslint/return-await set to in-try-catch mode', () => {
+      expect(typescriptRules['@typescript-eslint/return-await']).toEqual(['error', 'in-try-catch'])
+    })
   })
 
   describe('full config composition', () => {
@@ -190,6 +240,62 @@ describe('rule parity with Airbnb', () => {
       const baseIdx = names.indexOf('airbnb-flat/base')
       const eslintIdx = names.indexOf('airbnb-flat/eslint-recommended')
       expect(baseIdx).toBeGreaterThan(eslintIdx)
+    })
+
+    it('composition order: recommended < base < react < typescript < user-overrides < user-configs', () => {
+      const customConfig = { name: 'my-app/custom', rules: { 'no-debugger': 'off' as const } }
+      const configs = airbnb(
+        {
+          typescript: true,
+          react: true,
+          overrides: { 'no-console': 'off' },
+        },
+        customConfig,
+      )
+      const names = configs.map((c) => c.name).filter(Boolean) as string[]
+
+      const eslintIdx = names.indexOf('airbnb-flat/eslint-recommended')
+      const baseIdx = names.indexOf('airbnb-flat/base')
+      const reactIdx = names.indexOf('airbnb-flat/react')
+      const tsIdx = names.indexOf('airbnb-flat/typescript')
+      const overridesIdx = names.indexOf('airbnb-flat/user-overrides')
+      const customIdx = names.indexOf('my-app/custom')
+
+      expect(eslintIdx).toBeGreaterThanOrEqual(0)
+      expect(baseIdx).toBeGreaterThan(eslintIdx)
+      expect(reactIdx).toBeGreaterThan(baseIdx)
+      expect(tsIdx).toBeGreaterThan(reactIdx)
+      expect(overridesIdx).toBeGreaterThan(tsIdx)
+      expect(customIdx).toBeGreaterThan(overridesIdx)
+    })
+
+    it('every airbnb-flat/ name is present in the full config', () => {
+      const configs = airbnb({ typescript: true, react: true })
+      const names = configs.map((c) => c.name).filter(Boolean) as string[]
+      const required = [
+        'airbnb-flat/eslint-recommended',
+        'airbnb-flat/language-options',
+        'airbnb-flat/typescript-parser',
+        'airbnb-flat/react-recommended',
+        'airbnb-flat/react-jsx-runtime',
+        'airbnb-flat/react-hooks',
+        'airbnb-flat/jsx-a11y-recommended',
+        'airbnb-flat/react-settings',
+        'airbnb-flat/base',
+        'airbnb-flat/react',
+        'airbnb-flat/typescript',
+      ]
+      for (const name of required) {
+        expect(names, `missing config: ${name}`).toContain(name)
+      }
+    })
+
+    it('every config object with rules or plugins has a name', () => {
+      const configs = airbnb({ typescript: true, react: true })
+      const unnamed = configs.filter(
+        (c) => !c.name && (c.rules || c.plugins),
+      )
+      expect(unnamed).toHaveLength(0)
     })
   })
 })

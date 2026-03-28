@@ -17,7 +17,10 @@ export { baseRules, reactRules, typescriptRules }
  * Airbnb ESLint config for ESLint 9+ flat config.
  *
  * 1:1 rule parity with eslint-config-airbnb, audited against the Airbnb source.
- * 96 rules on top of recommended configs (69 base, 18 React, 9 TypeScript).
+ * 132 rules on top of recommended configs (97 base, 26 React, 9 TypeScript).
+ *
+ * With no options, produces a pure JavaScript config — typescript-eslint and its
+ * parser are only loaded when `typescript: true` is passed.
  *
  * @example
  * ```ts
@@ -25,7 +28,7 @@ export { baseRules, reactRules, typescriptRules }
  * import airbnb from 'eslint-config-airbnb-flat'
  * export default airbnb({ typescript: true, react: true })
  *
- * // Base only (no React, no TypeScript)
+ * // Base only (no React, no TypeScript — works without tsconfig.json)
  * export default airbnb()
  *
  * // With additional configs
@@ -46,6 +49,7 @@ export default function airbnb(
   } = options
 
   const configs: Linter.Config[] = []
+  const tsFiles = ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts']
 
   // -------------------------------------------------------------------------
   // 1. ESLint recommended (42 core JS rules)
@@ -58,11 +62,14 @@ export default function airbnb(
   // -------------------------------------------------------------------------
   // 2. typescript-eslint recommended (disables TS-redundant base rules)
   // -------------------------------------------------------------------------
-  for (const config of tseslint.configs.recommended) {
-    configs.push({
-      ...config,
-      name: config.name ?? 'airbnb-flat/typescript-eslint-recommended',
-    })
+  if (typescript) {
+    for (const config of tseslint.configs.recommended) {
+      configs.push({
+        ...config,
+        files: (config as Record<string, unknown>).files as string[] ?? tsFiles,
+        name: config.name ?? 'airbnb-flat/typescript-eslint-recommended',
+      })
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -75,12 +82,25 @@ export default function airbnb(
         ...globals.browser,
         ...globals.node,
       },
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: process.cwd(),
-      },
     },
   })
+
+  // -------------------------------------------------------------------------
+  // 3b. TypeScript parser options (only when typescript is enabled)
+  // -------------------------------------------------------------------------
+  if (typescript) {
+    const tsOpts = typeof typescript === 'object' ? typescript : {} as TypeScriptOptions
+    configs.push({
+      name: 'airbnb-flat/typescript-parser',
+      files: tsFiles,
+      languageOptions: {
+        parserOptions: {
+          projectService: true,
+          tsconfigRootDir: tsOpts.tsconfigRootDir ?? process.cwd(),
+        },
+      },
+    })
+  }
 
   // -------------------------------------------------------------------------
   // 4. React + JSX-a11y (if enabled)
@@ -141,6 +161,7 @@ export default function airbnb(
     const tsOpts = typeof typescript === 'object' ? typescript : {} as TypeScriptOptions
     configs.push({
       name: 'airbnb-flat/typescript',
+      files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
       rules: {
         ...typescriptRules,
         ...tsOpts.overrides,
