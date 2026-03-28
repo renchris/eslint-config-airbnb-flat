@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-flat-airbnb",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "packageManager": "pnpm@9.3.0",
   "description": "Airbnb's ESLint config for ESLint 9+ flat config — 1:1 rule parity, audited against source",
