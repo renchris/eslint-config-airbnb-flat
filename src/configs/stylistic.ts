@@ -356,9 +356,6 @@ export const stylisticJsxRules: Linter.RulesRecord = {
   // Specify whether double or single quotes should be used in JSX attributes (react.js)
   '@stylistic/jsx-quotes': ['error', 'prefer-double'],
 
-  // Enforce JSX indentation (react.js)
-  '@stylistic/jsx-indent': ['error', 2],
-
   // Validate props indentation in JSX (react.js)
   '@stylistic/jsx-indent-props': ['error', 2],
 
@@ -388,9 +385,6 @@ export const stylisticJsxRules: Linter.RulesRecord = {
 
   // One JSX Element Per Line (react.js)
   '@stylistic/jsx-one-expression-per-line': ['error', { allow: 'single-child' }],
-
-  // Disallow multiple spaces between inline JSX props (react.js)
-  '@stylistic/jsx-props-no-multi-spaces': 'error',
 
   // Validate whitespace in and around the JSX opening and closing brackets (react.js)
   '@stylistic/jsx-tag-spacing': ['error', {
