@@ -1,4 +1,4 @@
-# eslint-config-airbnb-flat
+# eslint-config-flat-airbnb
 
 Airbnb's ESLint style guide for **ESLint 9+ flat config** with TypeScript and React support.
 
@@ -16,7 +16,7 @@ Airbnb's ESLint style guide for **ESLint 9+ flat config** with TypeScript and Re
 ## Install
 
 ```bash
-pnpm add -D eslint-config-airbnb-flat eslint
+pnpm add -D eslint-config-flat-airbnb eslint
 ```
 
 ## Usage
@@ -25,7 +25,7 @@ pnpm add -D eslint-config-airbnb-flat eslint
 
 ```js
 // eslint.config.mjs
-import airbnb from 'eslint-config-airbnb-flat'
+import airbnb from 'eslint-config-flat-airbnb'
 
 export default airbnb({ typescript: true, react: true })
 ```
@@ -33,7 +33,7 @@ export default airbnb({ typescript: true, react: true })
 ### Base Only (JavaScript)
 
 ```js
-import airbnb from 'eslint-config-airbnb-flat'
+import airbnb from 'eslint-config-flat-airbnb'
 
 export default airbnb()
 ```
@@ -41,7 +41,7 @@ export default airbnb()
 ### TypeScript Only (No React)
 
 ```js
-import airbnb from 'eslint-config-airbnb-flat'
+import airbnb from 'eslint-config-flat-airbnb'
 
 export default airbnb({ typescript: true })
 ```
@@ -49,7 +49,7 @@ export default airbnb({ typescript: true })
 ### With Custom Overrides
 
 ```js
-import airbnb from 'eslint-config-airbnb-flat'
+import airbnb from 'eslint-config-flat-airbnb'
 
 export default airbnb(
   {
@@ -72,7 +72,7 @@ export default airbnb(
 ### With Feature Overrides
 
 ```js
-import airbnb from 'eslint-config-airbnb-flat'
+import airbnb from 'eslint-config-flat-airbnb'
 
 export default airbnb({
   typescript: {
@@ -91,7 +91,7 @@ export default airbnb({
 ### With Ignores
 
 ```js
-import airbnb from 'eslint-config-airbnb-flat'
+import airbnb from 'eslint-config-flat-airbnb'
 
 export default airbnb(
   { typescript: true, react: true },
@@ -102,7 +102,7 @@ export default airbnb(
 ### With Next.js
 
 ```js
-import airbnb from 'eslint-config-airbnb-flat'
+import airbnb from 'eslint-config-flat-airbnb'
 import nextPlugin from '@next/eslint-plugin-next'
 
 export default airbnb(
@@ -115,7 +115,7 @@ export default airbnb(
 
 ```js
 import { defineConfig } from 'eslint/config'
-import airbnb from 'eslint-config-airbnb-flat'
+import airbnb from 'eslint-config-flat-airbnb'
 
 export default defineConfig(...airbnb({ typescript: true, react: true }))
 ```
@@ -169,12 +169,12 @@ Every rule decision is documented in [`docs/rules.md`](./docs/rules.md) with:
 
 2. Install this package:
    ```bash
-   pnpm add -D eslint-config-airbnb-flat eslint
+   pnpm add -D eslint-config-flat-airbnb eslint
    ```
 
 3. Replace your `.eslintrc.js` with `eslint.config.mjs`:
    ```js
-   import airbnb from 'eslint-config-airbnb-flat'
+   import airbnb from 'eslint-config-flat-airbnb'
    export default airbnb({ typescript: true, react: true })
    ```
 

@@ -26,7 +26,7 @@ export { baseRules, reactRules, typescriptRules }
  * @example
  * ```ts
  * // eslint.config.mjs — Full stack
- * import airbnb from 'eslint-config-airbnb-flat'
+ * import airbnb from 'eslint-config-flat-airbnb'
  * export default airbnb({ typescript: true, react: true })
  *
  * // Base only (no React, no TypeScript — works without tsconfig.json)
