@@ -42,4 +42,34 @@ describe('integration: ESLint lints with this config', () => {
     const ruleIds = results[0].messages.map((m) => m.ruleId)
     expect(ruleIds).not.toContain('no-console')
   })
+
+  it('stylistic catches wrong quotes', async () => {
+    const eslint = new ESLint({
+      overrideConfigFile: true,
+      overrideConfig: airbnb({ stylistic: true }),
+    })
+    const results = await eslint.lintText('const x = "hello";\n', { filePath: 'test.js' })
+    const ruleIds = results[0].messages.map((m) => m.ruleId)
+    expect(ruleIds).toContain('@stylistic/quotes')
+  })
+
+  it('stylistic catches indent errors', async () => {
+    const eslint = new ESLint({
+      overrideConfigFile: true,
+      overrideConfig: airbnb({ stylistic: true }),
+    })
+    const results = await eslint.lintText('if (true) {\n    const x = 1;\n}\n', { filePath: 'test.js' })
+    const ruleIds = results[0].messages.map((m) => m.ruleId)
+    expect(ruleIds).toContain('@stylistic/indent')
+  })
+
+  it('stylistic does not fire when disabled', async () => {
+    const eslint = new ESLint({
+      overrideConfigFile: true,
+      overrideConfig: airbnb(),
+    })
+    const results = await eslint.lintText('const x = "hello";\n', { filePath: 'test.js' })
+    const ruleIds = results[0].messages.map((m) => m.ruleId)
+    expect(ruleIds).not.toContain('@stylistic/quotes')
+  })
 })

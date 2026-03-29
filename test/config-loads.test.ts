@@ -112,4 +112,64 @@ describe('config loads', () => {
       )
     }
   })
+
+  it('loads with stylistic enabled', () => {
+    const configs = airbnb({ stylistic: true })
+    const names = configs.map((c) => c.name).filter(Boolean)
+    expect(names).toContain('airbnb-flat/stylistic-plugin')
+    expect(names).toContain('airbnb-flat/stylistic')
+  })
+
+  it('does not include stylistic configs when disabled', () => {
+    const configs = airbnb()
+    const names = configs.map((c) => c.name).filter(Boolean) as string[]
+    const hasStylistic = names.some((n) => n.includes('stylistic'))
+    expect(hasStylistic).toBe(false)
+  })
+
+  it('stylistic-jsx is conditional on react', () => {
+    const withReact = airbnb({ stylistic: true, react: true })
+    const withReactNames = withReact.map((c) => c.name).filter(Boolean)
+    expect(withReactNames).toContain('airbnb-flat/stylistic-jsx')
+
+    const withoutReact = airbnb({ stylistic: true })
+    const withoutReactNames = withoutReact.map((c) => c.name).filter(Boolean)
+    expect(withoutReactNames).not.toContain('airbnb-flat/stylistic-jsx')
+  })
+
+  it('stylistic-typescript is conditional on typescript and scoped to TS files', () => {
+    const withTs = airbnb({ stylistic: true, typescript: true })
+    const tsStylistic = withTs.find((c) => c.name === 'airbnb-flat/stylistic-typescript')
+    expect(tsStylistic).toBeDefined()
+    expect(tsStylistic?.files).toEqual(
+      expect.arrayContaining(['**/*.ts', '**/*.tsx']),
+    )
+
+    const withoutTs = airbnb({ stylistic: true })
+    const names = withoutTs.map((c) => c.name).filter(Boolean)
+    expect(names).not.toContain('airbnb-flat/stylistic-typescript')
+  })
+
+  it('stylistic configs come after typescript, before user-overrides', () => {
+    const configs = airbnb({
+      stylistic: true,
+      typescript: true,
+      overrides: { 'no-console': 'off' },
+    })
+    const names = configs.map((c) => c.name).filter(Boolean) as string[]
+    const tsIdx = names.indexOf('airbnb-flat/typescript')
+    const stylisticIdx = names.indexOf('airbnb-flat/stylistic')
+    const overridesIdx = names.indexOf('airbnb-flat/user-overrides')
+    expect(stylisticIdx).toBeGreaterThan(tsIdx)
+    expect(stylisticIdx).toBeLessThan(overridesIdx)
+  })
+
+  it('applies stylistic overrides', () => {
+    const configs = airbnb({
+      stylistic: { overrides: { '@stylistic/semi': 'off' } },
+    })
+    const overrideConfig = configs.find((c) => c.name === 'airbnb-flat/stylistic-overrides')
+    expect(overrideConfig).toBeDefined()
+    expect(overrideConfig?.rules?.['@stylistic/semi']).toBe('off')
+  })
 })

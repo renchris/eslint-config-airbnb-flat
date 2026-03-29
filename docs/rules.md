@@ -14,6 +14,7 @@ No other Airbnb flat config alternative documents their decisions at this level.
 | **Airbnb upstream rules audited** | ~350 | Across 6 source files + react + react-a11y + import + typescript |
 | **Shipped in this package** | 140 | 101 base + 27 React + 12 TypeScript pairs |
 | **Inherited from recommended** | ~80 | eslint:recommended (42), tseslint:recommended (~25), react:recommended (~12) |
+| **Stylistic (opt-in)** | 76 | 63 base + 12 JSX + 1 TS override (+ 5 deprecated migrations) |
 | **Dropped** | ~170 | Formatting, PropTypes, class components, import plugin, redundant |
 
 ### Where rules live
@@ -250,6 +251,117 @@ This prevents false positives from base rules that don't understand TypeScript s
 | `no-unused-vars` | `@typescript-eslint/no-unused-vars` | error | `{ vars: 'all', args: 'after-used', ignoreRestSiblings: true }` | Type-aware: does not flag TypeScript type-only imports. Airbnb options preserved (check all vars, unused args after last used). |
 | `no-useless-constructor` | `@typescript-eslint/no-useless-constructor` | error | -- | Type-aware: understands TypeScript parameter properties (`constructor(private x: string) {}`). |
 | `no-array-constructor` | `@typescript-eslint/no-array-constructor` | error | -- | Type-aware: understands TypeScript generic array constructors (`new Array<string>()`). |
+
+---
+
+## Stylistic Rules (opt-in: 76 rules)
+
+These rules are the `@stylistic/eslint-plugin` equivalents of the ~60 Airbnb formatting rules dropped by default. Enable with `stylistic: true`.
+
+### Deprecated Rule Migrations (5 pairs)
+
+When stylistic is enabled, these base rules are turned off and replaced:
+
+| Base Rule (off) | @stylistic Equivalent | Source |
+|---|---|---|
+| `max-len` | `@stylistic/max-len` | style.js |
+| `no-confusing-arrow` | `@stylistic/no-confusing-arrow` | es6.js |
+| `spaced-comment` | `@stylistic/spaced-comment` | style.js |
+| `wrap-iife` | `@stylistic/wrap-iife` | best-practices.js |
+| `no-mixed-operators` | `@stylistic/no-mixed-operators` | style.js |
+
+### Base Formatting (63 rules)
+
+| Rule | Severity | Key Options | Source |
+|---|---|---|---|
+| `@stylistic/max-len` | error | 100, 2; ignoreUrls, ignoreStrings, ignoreTemplateLiterals, ignoreRegExpLiterals | style.js |
+| `@stylistic/no-confusing-arrow` | error | allowParens: true | es6.js |
+| `@stylistic/spaced-comment` | error | always; line/block exceptions and markers | style.js |
+| `@stylistic/wrap-iife` | error | outside; functionPrototypeMethods: false | best-practices.js |
+| `@stylistic/no-mixed-operators` | error | 9 operator groups; allowSamePrecedence: false | style.js |
+| `@stylistic/indent` | error | 2, SwitchCase: 1; JSX nodes ignored | style.js |
+| `@stylistic/semi` | error | always | style.js |
+| `@stylistic/semi-spacing` | error | before: false, after: true | style.js |
+| `@stylistic/semi-style` | error | last | style.js |
+| `@stylistic/quotes` | error | single; avoidEscape: true | style.js |
+| `@stylistic/quote-props` | error | as-needed; unnecessary: true | style.js |
+| `@stylistic/comma-dangle` | error | always-multiline (arrays, objects, imports, exports, functions) | style.js |
+| `@stylistic/comma-spacing` | error | before: false, after: true | style.js |
+| `@stylistic/comma-style` | error | last; 11 exception types: false | style.js |
+| `@stylistic/brace-style` | error | 1tbs; allowSingleLine: true | style.js |
+| `@stylistic/arrow-parens` | error | always | es6.js |
+| `@stylistic/arrow-spacing` | error | before: true, after: true | es6.js |
+| `@stylistic/array-bracket-spacing` | error | never | style.js |
+| `@stylistic/block-spacing` | error | always | style.js |
+| `@stylistic/computed-property-spacing` | error | never | style.js |
+| `@stylistic/function-call-spacing` | error | never | style.js |
+| `@stylistic/key-spacing` | error | beforeColon: false, afterColon: true | style.js |
+| `@stylistic/keyword-spacing` | error | before: true, after: true; return/throw/case overrides | style.js |
+| `@stylistic/object-curly-spacing` | error | always | style.js |
+| `@stylistic/space-before-blocks` | error | (default) | style.js |
+| `@stylistic/space-before-function-paren` | error | anonymous: always, named: never, asyncArrow: always | style.js |
+| `@stylistic/space-in-parens` | error | never | style.js |
+| `@stylistic/space-infix-ops` | error | (default) | style.js |
+| `@stylistic/space-unary-ops` | error | words: true, nonwords: false | style.js |
+| `@stylistic/switch-colon-spacing` | error | after: true, before: false | style.js |
+| `@stylistic/template-curly-spacing` | error | (default: never) | style.js |
+| `@stylistic/template-tag-spacing` | error | never | style.js |
+| `@stylistic/eol-last` | error | always | style.js |
+| `@stylistic/linebreak-style` | error | unix | style.js |
+| `@stylistic/lines-between-class-members` | error | always; exceptAfterSingleLine: false | style.js |
+| `@stylistic/new-parens` | error | (default) | style.js |
+| `@stylistic/newline-per-chained-call` | error | ignoreChainWithDepth: 4 | style.js |
+| `@stylistic/no-extra-semi` | error | (default) | style.js |
+| `@stylistic/no-floating-decimal` | error | (default) | best-practices.js |
+| `@stylistic/no-mixed-spaces-and-tabs` | error | (default) | style.js |
+| `@stylistic/no-multi-spaces` | error | ignoreEOLComments: false | best-practices.js |
+| `@stylistic/no-multiple-empty-lines` | error | max: 1, maxBOF: 0, maxEOF: 0 | style.js |
+| `@stylistic/no-tabs` | error | (default) | style.js |
+| `@stylistic/no-trailing-spaces` | error | skipBlankLines: false, ignoreComments: false | style.js |
+| `@stylistic/no-whitespace-before-property` | error | (default) | style.js |
+| `@stylistic/nonblock-statement-body-position` | error | beside | style.js |
+| `@stylistic/object-curly-newline` | error | minProperties: 4, multiline: true, consistent: true (per context) | style.js |
+| `@stylistic/object-property-newline` | error | allowAllPropertiesOnSameLine: true | style.js |
+| `@stylistic/one-var-declaration-per-line` | error | always | style.js |
+| `@stylistic/operator-linebreak` | error | before; '=' override: none | style.js |
+| `@stylistic/padded-blocks` | error | blocks/classes/switches: never; allowSingleLineBlocks: true | style.js |
+| `@stylistic/function-paren-newline` | error | multiline-arguments | style.js |
+| `@stylistic/function-call-argument-newline` | error | consistent | style.js |
+| `@stylistic/implicit-arrow-linebreak` | error | beside | style.js |
+| `@stylistic/generator-star-spacing` | error | before: false, after: true | es6.js |
+| `@stylistic/rest-spread-spacing` | error | never | es6.js |
+| `@stylistic/yield-star-spacing` | error | after | es6.js |
+| `@stylistic/dot-location` | error | property | best-practices.js |
+
+### JSX Formatting (12 rules)
+
+| Rule | Severity | Key Options | Source |
+|---|---|---|---|
+| `@stylistic/jsx-quotes` | error | prefer-double | react.js |
+| `@stylistic/jsx-indent-props` | error | 2 | react.js |
+| `@stylistic/jsx-closing-bracket-location` | error | line-aligned | react.js |
+| `@stylistic/jsx-closing-tag-location` | error | (default) | react.js |
+| `@stylistic/jsx-curly-spacing` | error | never; allowMultiline: true | react.js |
+| `@stylistic/jsx-curly-newline` | error | multiline: consistent, singleline: consistent | react.js |
+| `@stylistic/jsx-equals-spacing` | error | never | react.js |
+| `@stylistic/jsx-first-prop-new-line` | error | multiline-multiprop | react.js |
+| `@stylistic/jsx-max-props-per-line` | error | maximum: 1, when: multiline | react.js |
+| `@stylistic/jsx-one-expression-per-line` | error | allow: single-child | react.js |
+| `@stylistic/jsx-tag-spacing` | error | closingSlash: never, beforeSelfClosing: always, afterOpening: never, beforeClosing: never | react.js |
+| `@stylistic/jsx-wrap-multilines` | error | parens-new-line for declaration, assignment, return, arrow, condition, logical, prop | react.js |
+
+### TypeScript Override (1 rule)
+
+| Rule | Severity | Key Options | Source |
+|---|---|---|---|
+| `@stylistic/lines-between-class-members` | error | always; exceptAfterSingleLine: false, exceptAfterOverload: true | typescript |
+
+### Methodology Notes
+
+- Options copied verbatim from Airbnb source files (best-practices.js, es6.js, style.js, react.js)
+- `func-call-spacing` renamed to `function-call-spacing` per @stylistic convention
+- `jsx-indent` and `jsx-props-no-multi-spaces` removed (deprecated in @stylistic v4+, not in v5)
+- @stylistic v5+ is ESM-only with unified JS+TS+JSX rules
 
 ---
 

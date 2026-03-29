@@ -3,6 +3,9 @@ import airbnb from '../src/index.js'
 import { baseRules } from '../src/configs/base.js'
 import { reactRules } from '../src/configs/react.js'
 import { typescriptRules } from '../src/configs/typescript.js'
+import {
+  stylisticRules, stylisticJsxRules, stylisticTsRules,
+} from '../src/configs/stylistic.js'
 
 describe('rule parity with Airbnb', () => {
   describe('base rules (101)', () => {
@@ -296,6 +299,55 @@ describe('rule parity with Airbnb', () => {
         (c) => !c.name && (c.rules || c.plugins),
       )
       expect(unnamed).toHaveLength(0)
+    })
+  })
+
+  describe('stylistic rules (76)', () => {
+    const baseEntries = Object.keys(stylisticRules)
+    const jsxEntries = Object.keys(stylisticJsxRules)
+    const tsEntries = Object.keys(stylisticTsRules)
+
+    it('has 5 deprecated migration pairs (base-off + @stylistic-on)', () => {
+      const deprecatedPairs = [
+        ['max-len', '@stylistic/max-len'],
+        ['no-confusing-arrow', '@stylistic/no-confusing-arrow'],
+        ['spaced-comment', '@stylistic/spaced-comment'],
+        ['wrap-iife', '@stylistic/wrap-iife'],
+        ['no-mixed-operators', '@stylistic/no-mixed-operators'],
+      ]
+      for (const [base, stylistic] of deprecatedPairs) {
+        expect(stylisticRules[base], `${base} should be 'off'`).toBe('off')
+        expect(stylisticRules[stylistic], `${stylistic} should be defined`).toBeDefined()
+      }
+    })
+
+    it('has core formatting rules with correct Airbnb options', () => {
+      const indent = stylisticRules['@stylistic/indent'] as [string, number, ...unknown[]]
+      expect(indent[0]).toBe('error')
+      expect(indent[1]).toBe(2)
+
+      expect(stylisticRules['@stylistic/semi']).toEqual(['error', 'always'])
+      expect(stylisticRules['@stylistic/quotes']).toEqual(['error', 'single', { avoidEscape: true }])
+      expect(stylisticRules['@stylistic/arrow-parens']).toEqual(['error', 'always'])
+      expect(stylisticRules['@stylistic/brace-style']).toEqual(['error', '1tbs', { allowSingleLine: true }])
+    })
+
+    it('has exactly 63 base stylistic entries (58 rules + 5 off)', () => {
+      expect(baseEntries).toHaveLength(63)
+      const offEntries = baseEntries.filter((k) => stylisticRules[k] === 'off')
+      expect(offEntries).toHaveLength(5)
+    })
+
+    it('has exactly 12 JSX stylistic rules', () => {
+      expect(jsxEntries).toHaveLength(12)
+      expect(stylisticJsxRules['@stylistic/jsx-quotes']).toEqual(['error', 'prefer-double'])
+    })
+
+    it('has 1 TS stylistic override with exceptAfterOverload', () => {
+      expect(tsEntries).toHaveLength(1)
+      const rule = stylisticTsRules['@stylistic/lines-between-class-members'] as [string, string, Record<string, unknown>]
+      expect(rule[0]).toBe('error')
+      expect(rule[2].exceptAfterOverload).toBe(true)
     })
   })
 })
