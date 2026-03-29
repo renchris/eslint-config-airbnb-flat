@@ -1,5 +1,7 @@
 # eslint-config-flat-airbnb
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/renchris/eslint-config-airbnb-flat)
+
 Airbnb's ESLint style guide for **ESLint 9+ flat config** with TypeScript and React support.
 
 **1:1 rule parity** with `eslint-config-airbnb` -- 350 rules audited against the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript) source, 207 kept with exact option parity, 104 dropped with documented rationale.
