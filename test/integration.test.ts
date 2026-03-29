@@ -72,4 +72,26 @@ describe('integration: ESLint lints with this config', () => {
     const ruleIds = results[0].messages.map((m) => m.ruleId)
     expect(ruleIds).not.toContain('@stylistic/quotes')
   })
+
+  it('imports catches duplicate imports', async () => {
+    const eslint = new ESLint({
+      overrideConfigFile: true,
+      overrideConfig: airbnb({ imports: true }),
+    })
+    const code = 'import { foo } from \'bar\';\nimport { baz } from \'bar\';\n'
+    const results = await eslint.lintText(code, { filePath: 'test.js' })
+    const ruleIds = results[0].messages.map((m) => m.ruleId)
+    expect(ruleIds).toContain('import-x/no-duplicates')
+  })
+
+  it('imports does not fire when disabled', async () => {
+    const eslint = new ESLint({
+      overrideConfigFile: true,
+      overrideConfig: airbnb(),
+    })
+    const code = 'import { foo } from \'bar\';\nimport { baz } from \'bar\';\n'
+    const results = await eslint.lintText(code, { filePath: 'test.js' })
+    const ruleIds = results[0].messages.map((m) => m.ruleId)
+    expect(ruleIds).not.toContain('import-x/no-duplicates')
+  })
 })

@@ -6,7 +6,7 @@ Airbnb's ESLint style guide for **ESLint 9+ flat config** with TypeScript and Re
 
 **1:1 rule parity** with `eslint-config-airbnb` -- 350 rules audited against the [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript) source, 207 kept with exact option parity, 104 dropped with documented rationale.
 
-140 linting rules + 76 optional formatting rules: 101 base JavaScript, 27 React + JSX-a11y, 12 TypeScript, 76 stylistic.
+140 linting rules + 76 optional formatting rules + 15 optional import rules: 101 base JavaScript, 27 React + JSX-a11y, 12 TypeScript, 76 stylistic, 14+1 imports.
 
 ## Why This Package?
 
@@ -141,6 +141,30 @@ export default airbnb({
 })
 ```
 
+### With Import Rules
+
+```js
+import airbnb from 'eslint-config-flat-airbnb'
+
+export default airbnb({
+  typescript: true,
+  react: true,
+  imports: true,
+})
+```
+
+### With Import Cycle Detection
+
+```js
+import airbnb from 'eslint-config-flat-airbnb'
+
+export default airbnb({
+  typescript: true,
+  react: true,
+  imports: { cycle: true },
+})
+```
+
 ### With ESLint 10 `defineConfig()`
 
 ```js
@@ -180,6 +204,14 @@ export default defineConfig(...airbnb({ typescript: true, react: true }))
 - 5 deprecated rule migrations (max-len, spaced-comment, etc. → @stylistic equivalents)
 - Replaces Prettier for projects that prefer linter-enforced formatting
 
+### Imports (opt-in: `imports: true`)
+
+- **14 Airbnb import rules** via `eslint-plugin-import-x`
+- Import ordering, no duplicates, no self-imports, no mutable exports
+- TypeScript resolver auto-configured when `typescript: true`
+- Optional cycle detection: `imports: { cycle: true }` (expensive, uses maxDepth: 2)
+- 9 Airbnb import rules dropped (TypeScript-redundant: no-unresolved, named, default, namespace)
+
 ## Rule Audit
 
 Every rule decision is documented in [`docs/rules.md`](./docs/rules.md) with:
@@ -194,7 +226,7 @@ Every rule decision is documented in [`docs/rules.md`](./docs/rules.md) with:
 | Formatting / stylistic | ~60 | Dropped by default; opt-in via `stylistic: true` (see above) |
 | PropTypes | ~8 | TypeScript replaces runtime type checking |
 | Class components | ~10 | Modern React uses function components |
-| `eslint-plugin-import` | ~25 | Plugin has chronic ESLint 9 issues; TypeScript handles imports |
+| `eslint-plugin-import` | ~25 | 14 kept via `imports: true`; 9 dropped (TypeScript-redundant); 2 dropped (env-specific) |
 | TS-redundant | ~5 | Already enforced by `typescript-eslint:recommended` |
 
 ## Migrating from `eslint-config-airbnb`
@@ -238,6 +270,9 @@ Every rule decision is documented in [`docs/rules.md`](./docs/rules.md) with:
 | `stylisticJsxRules` | Raw JSX stylistic rules object (12 rules) |
 | `stylisticTsRules` | Raw TS stylistic override object (1 rule) |
 | `StylisticOptions` | TypeScript type for stylistic options |
+| `importRules` | Raw import rules object (14 rules) |
+| `importCycleRules` | Raw import cycle rules object (1 rule) |
+| `ImportsOptions` | TypeScript type for imports options |
 | `AirbnbOptions` | TypeScript type for options |
 
 ## Peer Dependencies

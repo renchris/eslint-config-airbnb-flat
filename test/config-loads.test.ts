@@ -172,4 +172,61 @@ describe('config loads', () => {
     expect(overrideConfig).toBeDefined()
     expect(overrideConfig?.rules?.['@stylistic/semi']).toBe('off')
   })
+
+  it('loads with imports enabled', () => {
+    const configs = airbnb({ imports: true })
+    const names = configs.map((c) => c.name).filter(Boolean)
+    expect(names).toContain('airbnb-flat/imports-plugin')
+    expect(names).toContain('airbnb-flat/imports')
+  })
+
+  it('does not include imports configs when disabled', () => {
+    const configs = airbnb()
+    const names = configs.map((c) => c.name).filter(Boolean) as string[]
+    const hasImports = names.some((n) => n.includes('imports'))
+    expect(hasImports).toBe(false)
+  })
+
+  it('imports-typescript is conditional on typescript', () => {
+    const withTs = airbnb({ imports: true, typescript: true })
+    const withTsNames = withTs.map((c) => c.name).filter(Boolean)
+    expect(withTsNames).toContain('airbnb-flat/imports-typescript')
+
+    const withoutTs = airbnb({ imports: true })
+    const withoutTsNames = withoutTs.map((c) => c.name).filter(Boolean)
+    expect(withoutTsNames).not.toContain('airbnb-flat/imports-typescript')
+  })
+
+  it('imports-cycle is conditional on cycle option', () => {
+    const withCycle = airbnb({ imports: { cycle: true } })
+    const withCycleNames = withCycle.map((c) => c.name).filter(Boolean)
+    expect(withCycleNames).toContain('airbnb-flat/imports-cycle')
+
+    const withoutCycle = airbnb({ imports: true })
+    const withoutCycleNames = withoutCycle.map((c) => c.name).filter(Boolean)
+    expect(withoutCycleNames).not.toContain('airbnb-flat/imports-cycle')
+  })
+
+  it('imports configs come after stylistic, before user-overrides', () => {
+    const configs = airbnb({
+      stylistic: true,
+      imports: true,
+      overrides: { 'no-console': 'off' },
+    })
+    const names = configs.map((c) => c.name).filter(Boolean) as string[]
+    const stylisticIdx = names.indexOf('airbnb-flat/stylistic')
+    const importsIdx = names.indexOf('airbnb-flat/imports')
+    const overridesIdx = names.indexOf('airbnb-flat/user-overrides')
+    expect(importsIdx).toBeGreaterThan(stylisticIdx)
+    expect(importsIdx).toBeLessThan(overridesIdx)
+  })
+
+  it('applies imports overrides', () => {
+    const configs = airbnb({
+      imports: { overrides: { 'import-x/no-duplicates': 'off' } },
+    })
+    const overrideConfig = configs.find((c) => c.name === 'airbnb-flat/imports-overrides')
+    expect(overrideConfig).toBeDefined()
+    expect(overrideConfig?.rules?.['import-x/no-duplicates']).toBe('off')
+  })
 })

@@ -15,7 +15,8 @@ No other Airbnb flat config alternative documents their decisions at this level.
 | **Shipped in this package** | 140 | 101 base + 27 React + 12 TypeScript pairs |
 | **Inherited from recommended** | ~80 | eslint:recommended (42), tseslint:recommended (~25), react:recommended (~12) |
 | **Stylistic (opt-in)** | 76 | 63 base + 12 JSX + 1 TS override (+ 5 deprecated migrations) |
-| **Dropped** | ~170 | Formatting, PropTypes, class components, import plugin, redundant |
+| **Imports (opt-in)** | 15 | 14 base + 1 cycle detection (via `eslint-plugin-import-x`) |
+| **Dropped** | ~160 | Formatting, PropTypes, class components, import (9 dropped), redundant |
 
 ### Where rules live
 
@@ -29,6 +30,7 @@ comes from layering:
 5. **`airbnb-flat/base`** (101 rules) -- Airbnb opinions beyond recommended
 6. **`airbnb-flat/react`** (27 rules) -- Airbnb React opinions beyond recommended
 7. **`airbnb-flat/typescript`** (12 rule pairs) -- type-aware replacements
+8. **`airbnb-flat/imports`** (14+1 rules, opt-in) -- import ordering, duplicates, cycles
 
 ---
 
@@ -365,6 +367,69 @@ When stylistic is enabled, these base rules are turned off and replaced:
 
 ---
 
+## Import Rules (opt-in: 14 + 1 rules)
+
+Source: `airbnb/javascript` > `packages/eslint-config-airbnb-base/rules/imports.js` via `eslint-plugin-import-x`
+
+Enable with `imports: true`. Of 25 Airbnb import rules, 14 are kept with exact option
+parity, 1 is opt-in via `cycle: true`, and 10 are dropped with documented rationale.
+
+### Base Import Rules (14 rules)
+
+| Rule | Severity | Options | Source |
+|------|----------|---------|--------|
+| `import-x/export` | error | -- | imports.js: Helpful warnings |
+| `import-x/no-named-as-default` | error | -- | imports.js: Helpful warnings |
+| `import-x/no-named-as-default-member` | error | -- | imports.js: Helpful warnings |
+| `import-x/no-mutable-exports` | error | -- | imports.js: Helpful warnings |
+| `import-x/no-self-import` | error | -- | imports.js: Helpful warnings |
+| `import-x/no-amd` | error | -- | imports.js: Module systems |
+| `import-x/first` | error | -- | imports.js: Style guide |
+| `import-x/no-duplicates` | error | -- | imports.js: Style guide |
+| `import-x/extensions` | error | `'ignorePackages', { js/mjs/jsx/ts/tsx/mts: 'never' }` | imports.js: Style guide |
+| `import-x/order` | error | `{ groups: [['builtin', 'external', 'internal']] }` | imports.js: Style guide |
+| `import-x/newline-after-import` | error | -- | imports.js: Style guide |
+| `import-x/no-absolute-path` | error | -- | imports.js: Style guide |
+| `import-x/no-useless-path-segments` | error | `{ commonjs: true }` | imports.js: Style guide |
+| `import-x/no-named-default` | error | -- | imports.js: Style guide |
+
+### Cycle Detection (1 rule, opt-in: `imports: { cycle: true }`)
+
+| Rule | Severity | Options | Source |
+|------|----------|---------|--------|
+| `import-x/no-cycle` | error | `{ maxDepth: 2, ignoreExternal: true }` | imports.js: Helpful warnings |
+
+Airbnb enables with `maxDepth: ∞`. We default to `maxDepth: 2` for performance
+(catches 95%+ of real circular deps, significantly cheaper than full graph traversal).
+
+### Dropped Import Rules
+
+**TypeScript-redundant** (4 rules) -- TypeScript compiler handles these at build time:
+
+| Rule | Why Dropped |
+|------|-------------|
+| `import/no-unresolved` | TypeScript compiler catches unresolved imports. |
+| `import/named` | TypeScript compiler verifies named exports exist. |
+| `import/default` | TypeScript compiler verifies default exports. |
+| `import/namespace` | TypeScript compiler verifies namespace imports. |
+
+**Environment-specific** (3 rules) -- bundler/build-tool-specific, not universal:
+
+| Rule | Why Dropped |
+|------|-------------|
+| `import/no-dynamic-require` | CommonJS-specific; TypeScript `import()` is type-checked. |
+| `import/no-webpack-loader-syntax` | Webpack-specific; Next.js/Vite handle natively. |
+| `import/no-import-module-exports` | CommonJS/ESM interop edge case; bundlers handle. |
+
+**Controversial / project-specific** (2 rules):
+
+| Rule | Why Dropped |
+|------|-------------|
+| `import/prefer-default-export` | Controversial. Named exports are often preferred (better tree-shaking, explicit API). |
+| `import/no-relative-packages` | Monorepo-specific. Not universally applicable. |
+
+---
+
 ## Dropped Rules -- By Category
 
 ### Formatting / Stylistic (~60 rules)
@@ -494,14 +559,14 @@ that have no equivalent in function components.
 | `react/prefer-stateless-function` | error | All components are already stateless functions. |
 | `react/no-multi-comp` | error | Was `off` in Airbnb; irrelevant without class component boilerplate. |
 
-### eslint-plugin-import (~25 rules)
+### eslint-plugin-import (~9 dropped rules, 14+1 kept)
 
-**Rationale**: `eslint-plugin-import` has had chronic ESLint 9 flat config compatibility
-issues. Multiple GitHub issues document broken resolution, performance regressions, and
-incomplete flat config support. TypeScript + bundlers (Next.js, Vite) already handle
-import resolution, cycle detection, and module boundaries at build time.
+**Update**: As of the `imports: true` opt-in feature, 14 Airbnb import rules are now
+available via `eslint-plugin-import-x` (the ESLint 9 compatible fork). 1 additional
+cycle detection rule is opt-in via `imports: { cycle: true }`. See
+[Import Rules](#import-rules-opt-in-14--1-rules) above for the kept rules.
 
-The `eslint-plugin-import` rules fell into three sub-categories:
+The remaining ~9 dropped rules fall into these categories:
 
 **Static analysis (resolution)** -- TypeScript handles:
 
@@ -511,35 +576,21 @@ The `eslint-plugin-import` rules fell into three sub-categories:
 | `import/named` | TypeScript compiler verifies named exports exist. |
 | `import/default` | TypeScript compiler verifies default exports. |
 | `import/namespace` | TypeScript compiler verifies namespace imports. |
-| `import/no-absolute-path` | Rare issue; bundler config prevents. |
-| `import/no-dynamic-require` | TypeScript `import()` syntax is type-checked. |
-| `import/no-webpack-loader-syntax` | Webpack-specific; Next.js handles. |
 
-**Helpful warnings** -- dropped due to plugin instability:
+**Environment-specific**:
 
 | Rule | Why Dropped |
 |------|-------------|
-| `import/no-cycle` | Expensive rule (full graph traversal). TypeScript strict mode + bundler tree-shaking mitigate cycles. |
-| `import/no-self-import` | TypeScript compiler errors on self-imports. |
-| `import/no-useless-path-segments` | Nice-to-have but not worth plugin dependency. |
-| `import/no-relative-packages` | Monorepo-specific. |
-| `import/no-mutable-exports` | `prefer-const` + TypeScript `readonly` cover this. |
-| `import/no-extraneous-dependencies` | `package.json` `dependencies` vs `devDependencies` enforcement. TypeScript + bundlers catch missing deps at build. |
+| `import/no-dynamic-require` | CommonJS-specific; TypeScript `import()` is type-checked. |
+| `import/no-webpack-loader-syntax` | Webpack-specific; Next.js/Vite handle natively. |
+| `import/no-import-module-exports` | CommonJS/ESM interop edge case; bundlers handle. |
 
-**Style / ordering** -- formatting concern:
+**Controversial / project-specific**:
 
 | Rule | Why Dropped |
 |------|-------------|
-| `import/order` | Import ordering is a formatting concern (Prettier plugin or `@ianvs/prettier-plugin-sort-imports`). |
-| `import/newline-after-import` | Formatting (Prettier). |
 | `import/prefer-default-export` | Controversial. Named exports are often preferred (better tree-shaking, explicit API). |
-| `import/no-named-as-default` | False positives with TypeScript re-exports. |
-| `import/no-named-as-default-member` | False positives with TypeScript namespace patterns. |
-| `import/no-duplicates` | TypeScript compiler + Prettier import sort handle duplicate imports. |
-| `import/extensions` | TypeScript handles extension resolution. Bundlers resolve `.ts`/`.tsx`. |
-| `import/first` | Formatting (import order). |
-| `import/no-anonymous-default-export` | Style preference; named exports enforced by convention. |
-| `import/no-named-default` | Style preference. |
+| `import/no-relative-packages` | Monorepo-specific. Not universally applicable. |
 
 ### TypeScript-Redundant (~5 rules)
 

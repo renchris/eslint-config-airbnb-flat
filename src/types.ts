@@ -28,6 +28,21 @@ export interface StylisticOptions {
   overrides?: Linter.RulesRecord
 }
 
+export interface ImportsOptions {
+  /**
+   * Override specific import rules.
+   */
+  overrides?: Linter.RulesRecord
+
+  /**
+   * Enable circular dependency detection via import-x/no-cycle.
+   * Disabled by default due to significant performance cost.
+   * When enabled, uses maxDepth: 2 and ignoreExternal: true.
+   * @default false
+   */
+  cycle?: boolean
+}
+
 export interface AirbnbOptions {
   /**
    * Enable TypeScript support.
@@ -52,6 +67,14 @@ export interface AirbnbOptions {
    * - `object`: Enable with custom overrides
    */
   stylistic?: boolean | StylisticOptions
+
+  /**
+   * Enable import rules via eslint-plugin-import-x.
+   * - `true`: Enable with Airbnb defaults (14 import rules)
+   * - `false` or omitted: Disable
+   * - `object`: Enable with custom overrides and cycle detection
+   */
+  imports?: boolean | ImportsOptions
 
   /**
    * Override specific base rules.

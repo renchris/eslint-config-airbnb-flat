@@ -6,6 +6,7 @@ import { typescriptRules } from '../src/configs/typescript.js'
 import {
   stylisticRules, stylisticJsxRules, stylisticTsRules,
 } from '../src/configs/stylistic.js'
+import { importRules, importCycleRules } from '../src/configs/imports.js'
 
 describe('rule parity with Airbnb', () => {
   describe('base rules (101)', () => {
@@ -299,6 +300,42 @@ describe('rule parity with Airbnb', () => {
         (c) => !c.name && (c.rules || c.plugins),
       )
       expect(unnamed).toHaveLength(0)
+    })
+  })
+
+  describe('import rules (14+1)', () => {
+    const baseRuleNames = Object.keys(importRules)
+    const cycleRuleNames = Object.keys(importCycleRules)
+
+    it('has exactly 14 base import rules', () => {
+      expect(baseRuleNames).toHaveLength(14)
+    })
+
+    it('has core Airbnb import rules', () => {
+      const required = [
+        'import-x/order',
+        'import-x/first',
+        'import-x/no-duplicates',
+        'import-x/export',
+        'import-x/no-self-import',
+      ]
+      for (const rule of required) {
+        expect(baseRuleNames, `missing rule: ${rule}`).toContain(rule)
+      }
+    })
+
+    it('has correct import/order groups option', () => {
+      const rule = importRules['import-x/order'] as [string, Record<string, unknown>]
+      expect(rule[0]).toBe('error')
+      expect(rule[1].groups).toEqual([['builtin', 'external', 'internal']])
+    })
+
+    it('has 1 cycle rule with maxDepth 2', () => {
+      expect(cycleRuleNames).toHaveLength(1)
+      expect(cycleRuleNames).toContain('import-x/no-cycle')
+      const rule = importCycleRules['import-x/no-cycle'] as [string, Record<string, unknown>]
+      expect(rule[0]).toBe('error')
+      expect(rule[1].maxDepth).toBe(2)
     })
   })
 

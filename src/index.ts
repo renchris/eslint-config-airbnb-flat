@@ -6,14 +6,17 @@ import jsxA11yPlugin from 'eslint-plugin-jsx-a11y'
 import globals from 'globals'
 import stylisticPlugin from '@stylistic/eslint-plugin'
 import type { Linter } from 'eslint'
-import type { AirbnbOptions, ReactOptions, TypeScriptOptions, StylisticOptions } from './types.js'
+import importXPlugin from 'eslint-plugin-import-x'
+import type { AirbnbOptions, ReactOptions, TypeScriptOptions, StylisticOptions, ImportsOptions } from './types.js'
 import { baseRules } from './configs/base.js'
 import { reactRules } from './configs/react.js'
 import { typescriptRules } from './configs/typescript.js'
 import { stylisticRules, stylisticJsxRules, stylisticTsRules } from './configs/stylistic.js'
+import { importRules, importCycleRules } from './configs/imports.js'
 
-export type { AirbnbOptions, ReactOptions, TypeScriptOptions, StylisticOptions }
+export type { AirbnbOptions, ReactOptions, TypeScriptOptions, StylisticOptions, ImportsOptions }
 export { baseRules, reactRules, typescriptRules, stylisticRules, stylisticJsxRules, stylisticTsRules }
+export { importRules, importCycleRules }
 
 /**
  * Airbnb ESLint config for ESLint 9+ flat config.
@@ -49,6 +52,7 @@ export default function airbnb(
     typescript = false,
     react = false,
     stylistic = false,
+    imports = false,
     overrides,
   } = options
 
@@ -208,6 +212,47 @@ export default function airbnb(
       configs.push({
         name: 'airbnb-flat/stylistic-overrides',
         rules: stylisticOpts.overrides,
+      })
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // 7c. Import rules via eslint-plugin-import-x (if enabled)
+  // -------------------------------------------------------------------------
+  if (imports) {
+    const importsOpts = typeof imports === 'object' ? imports : {} as ImportsOptions
+
+    configs.push({
+      name: 'airbnb-flat/imports-plugin',
+      plugins: { 'import-x': importXPlugin },
+    })
+
+    configs.push({
+      name: 'airbnb-flat/imports',
+      rules: { ...importRules },
+    })
+
+    if (typescript) {
+      configs.push({
+        name: 'airbnb-flat/imports-typescript',
+        files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+        settings: {
+          'import-x/resolver': { typescript: true },
+        },
+      })
+    }
+
+    if (importsOpts.cycle) {
+      configs.push({
+        name: 'airbnb-flat/imports-cycle',
+        rules: { ...importCycleRules },
+      })
+    }
+
+    if (importsOpts.overrides) {
+      configs.push({
+        name: 'airbnb-flat/imports-overrides',
+        rules: importsOpts.overrides,
       })
     }
   }
