@@ -1,5 +1,11 @@
 # eslint-config-flat-airbnb
 
+## 0.4.0
+
+### Minor Changes
+
+- [`b5545a9`](https://github.com/renchris/eslint-config-airbnb-flat/commit/b5545a9e49fd8096d05814b6c2570fb4425b401e) Thanks [@renchris](https://github.com/renchris)! - Add `imports: true` option with 14 Airbnb import rules via `eslint-plugin-import-x`. Includes import ordering, no duplicates, no self-imports, no mutable exports, and more. Optional cycle detection via `imports: { cycle: true }` with performance-safe defaults (maxDepth: 2, ignoreExternal: true). TypeScript resolver auto-configured when `typescript: true`.
+
 ## 0.3.0
 
 ### Minor Changes
